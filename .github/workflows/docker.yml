@@ -27,3 +27,15 @@ jobs:
           IMAGE="${{ env.REGISTRY }}/${{ secrets.DO_REGISTRY }}/web-dashboard:${GITHUB_SHA}"
           docker build -t "$IMAGE" .
           docker push "$IMAGE"
+
+      - name: Notify iness-infra
+        run: |
+          IMAGE_BASE="${{ env.REGISTRY }}/${{ secrets.DO_REGISTRY }}/web-dashboard"
+          TAG="${GITHUB_SHA}"
+
+          curl -s -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token ${{ secrets.INFRA_DISPATCH_TOKEN }}" \
+            https://api.github.com/repos/inesskall/iness-infra/dispatches \
+            -d "{\"event_type\":\"service_image_pushed\",\"client_payload\":{\"service\":\"web\",\"image\":\"${IMAGE_BASE}\",\"tag\":\"${TAG}\"}}"
+
