@@ -38,4 +38,3 @@ jobs:
             -H "Authorization: token ${{ secrets.INFRA_DISPATCH_TOKEN }}" \
             https://api.github.com/repos/inesskall/iness-infra/dispatches \
             -d "{\"event_type\":\"service_image_pushed\",\"client_payload\":{\"service\":\"web\",\"image\":\"${IMAGE_BASE}\",\"tag\":\"${TAG}\"}}"
-
