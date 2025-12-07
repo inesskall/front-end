@@ -42,6 +42,9 @@ interface AgentDecision {
 const formatNumber = (value: number | null | undefined, digits = 2, empty = "---") =>
     value == null ? empty : value.toFixed(digits)
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? ""
+
+
 export default function Dashboard() {
   const [isConnected, setIsConnected] = useState(false)
   const [currentTick, setCurrentTick] = useState<MarketTick | null>(null)
@@ -59,7 +62,7 @@ export default function Dashboard() {
   const fetchInitialMarketData = async () => {
     try {
       addLog("Fetching initial market data...")
-      const res = await fetch("http://localhost:8081/api/market/current")
+      const res = await fetch(`${API_BASE}/api/market/current`)
       if (!res.ok) throw new Error("Failed to fetch market data")
       const data: MarketTick = await res.json()
       setCurrentTick(data)
@@ -73,7 +76,7 @@ export default function Dashboard() {
   const fetchLastAgentDecision = async () => {
     try {
       addLog("Fetching last agent decision...")
-      const res = await fetch("http://localhost:8081/api/market/last-decision")
+      const res = await fetch(`${API_BASE}/api/market/last-decision`)
       if (!res.ok) throw new Error("Failed to fetch decision")
       const data: AgentDecision = await res.json()
       setAgentDecision(data)
@@ -91,7 +94,7 @@ export default function Dashboard() {
   const handleForceUpdate = async () => {
     try {
       addLog("Requesting force update...")
-      const res = await fetch("http://localhost:8081/api/market/force-update", { method: "POST" })
+      const res = await fetch(`${API_BASE}/api/market/force-update`, { method: "POST" })
       if (!res.ok) throw new Error("Force update failed")
       addLog("Force update requested successfully")
     } catch (error) {
@@ -106,7 +109,7 @@ export default function Dashboard() {
       setIsLoading(false)
     })
 
-    const socket = new SockJS("http://localhost:8081/ws-market")
+    const socket = new SockJS(`${API_BASE}/ws-market`)
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
